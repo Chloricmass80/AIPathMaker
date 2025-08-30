@@ -1,0 +1,13 @@
+{
+  "name": "AIPathMaker",
+  "tree": {
+    "$className": "DataModel",
+
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "AiPathMaker": {
+        "$path": "src"
+      }
+    }
+  }
+}
