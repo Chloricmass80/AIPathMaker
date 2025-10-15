@@ -95,7 +95,6 @@ function StateManager:ChangeToEditingPosition(positionSelection:PositionSelectio
     newPathButton.Text = TextOptions.pathButtonEditingPosition
 
     self.selectedPosition = positionSelection or self.selectedPosition
-    print("EditingPosition")
 end
 
 function StateManager:_DeselectPatrolPoint()
