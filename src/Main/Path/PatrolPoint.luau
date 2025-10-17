@@ -22,6 +22,7 @@ function PatrolPoint.new(position:Vector3, pointIndex:number, patrolPathInstFldr
     patrolPart.Anchored = true
     patrolPart:SetAttribute("WaitTime", 0)
     patrolPart:SetAttribute("PointIndex", pointIndex)
+    patrolPart.Locked = true
     patrolPart.Parent = pointFldr
 
     local self = setmetatable({
@@ -79,16 +80,18 @@ function PatrolPoint:_VisualizeNormal(normal:Vector3) : BasePart?
         nrmlVisual.CanCollide = false
         nrmlVisual.CanQuery = false
         nrmlVisual.Anchored = true
+        nrmlVisual.Locked = true
         nrmlVisual.Parent = visual
 
         return nrmlVisual
     end
 
     local function orientateNormalVisual(nrmlVisual:BasePart)
-        nrmlVisual.PivotOffset = CFrame.new(0,0,1.25)
-        nrmlVisual.CFrame = CFrame.lookAlong(Vector3.new(), normal)
-        local dif = visual.CFrame.Position - (nrmlVisual.CFrame.Position + nrmlVisual.PivotOffset.Position)
-        nrmlVisual.CFrame = CFrame.new(nrmlVisual.CFrame.Position + dif) * CFrame.Angles(nrmlVisual.CFrame:ToEulerAnglesXYZ())
+        local pivot = CFrame.new(visual.CFrame.Position)
+        nrmlVisual.CFrame = CFrame.new(visual.CFrame.Position + Vector3.new(0,0.5,1.25))
+        local offset = pivot:ToObjectSpace(nrmlVisual.CFrame)
+        pivot = CFrame.lookAlong(pivot.Position, normal)
+        nrmlVisual.CFrame = pivot * offset
     end
 
     if not normal then

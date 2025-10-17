@@ -26,8 +26,6 @@ function SavedPaths:ReconstructFromSavedPaths()
         paths[pathNum] = path
     end
 
-    print(paths)
-
     self.Paths = paths
 end
 

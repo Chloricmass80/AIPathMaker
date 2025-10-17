@@ -7,17 +7,21 @@ function PathingAI.GetPoints(character:Model, patrolPointModule:ModuleScript, pa
     local pathNum = character:GetAttribute("PathNum")
     assert(pathNum, "The character doesn't have an associated path through the plugin.")
 
+    if not savedPathsFldr then return end
     local pathFldr = savedPathsFldr:FindFirstChild(string.format("PathFldr%s", tostring(pathNum)))
+    if not pathFldr then return end
     local points = {}
 
-    for _, point in pathFldr:GetDescendants() do
-        local index = point:GetAttribute("PointIndex")
-        local waitTime = point:GetAttribute("WaitTime")
-        local position = point.Position
-        local normal = point:GetAttribute("Normal")
+    for _, point in pathFldr:GetChildren() do
+		local pointPart = point.PatrolPointPart
+		local index = pointPart:GetAttribute("PointIndex")
+		local waitTime = pointPart:GetAttribute("WaitTime")
+		local position = pointPart.Position
+		local normal = pointPart:GetAttribute("Normal")
 
         local actions = {}
         for _, action in point:GetDescendants() do
+            if not action:IsA("StringValue") then continue end
             local weight = action:GetAttribute("Weight")
             local waitForAnim = action:GetAttribute("WaitForAnim")
             local actionName = action.Name

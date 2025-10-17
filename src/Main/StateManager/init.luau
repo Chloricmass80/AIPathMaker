@@ -46,7 +46,6 @@ function StateManager:ChangeToSelectingCharacter()
     self.selectedCharacter = nil
     self.selectedPath = nil
     self.selectedPosition = nil
-    print("SelectingCharacter")
 end
 
 function StateManager:ChangeToCharacterSelected(character:Model?)
@@ -59,7 +58,6 @@ function StateManager:ChangeToCharacterSelected(character:Model?)
     self.selectedCharacter = character or self.selectedCharacter
     self.selectedPath = nil
     self.selectedPosition = nil
-    print("CharacterSelected")
 end
 
 function StateManager:ChangeToEditingPath(path:PatrolPath?)
@@ -73,7 +71,6 @@ function StateManager:ChangeToEditingPath(path:PatrolPath?)
 
     self.selectedPath = path or self.selectedPath
     self.selectedPosition = nil
-    print("EditingPath")
 end
 
 function StateManager:ChangeToSelectingPosition()
@@ -84,7 +81,6 @@ function StateManager:ChangeToSelectingPosition()
     self.currentState = States.SelectingPosition
 
     self.selectedPosition = nil
-    print("SelectingPosition")
 end
 
 function StateManager:ChangeToEditingPosition(positionSelection:PositionSelection?)

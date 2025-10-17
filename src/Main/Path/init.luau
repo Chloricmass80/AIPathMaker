@@ -14,7 +14,6 @@ type PointConnection = TypeDefs.PointConnection
 
 function Path.new(character:Model, parentFldr:Folder) : PatrolPath
     local pathNum = #SavedPaths.Paths+1
-    print(pathNum)
     local pathFldr = Instance.new("Folder")
     pathFldr:SetAttribute("PathNum", pathNum)
     pathFldr.Name = string.format("PathFldr%s", tostring(pathNum))
@@ -110,7 +109,7 @@ end
 function Path:_RemovePointConnection(pointConnectionIndex:number)
     local pointConnection = self._pointConnections[pointConnectionIndex]
     pointConnection:Destroy()
-    pointConnection[pointConnectionIndex] = nil
+    table.remove(self._pointConnections, pointConnectionIndex)
 end
 
 function Path:AddPatrolPoint(position:Vector3, pointIndex:number?)
@@ -131,13 +130,17 @@ function Path:RemovePatrolPoint(pointIndex:number)
     local point:PatrolPoint = self.points[pointIndex]
     if pointIndex > 1 then
         self:_RemovePointConnection(pointIndex - 1)
+    else
+        self:_RemovePointConnection(pointIndex)
     end
 
     point:Destroy()
     table.remove(self.points, pointIndex)
 
     if self.points[pointIndex] then
-        self:_PointConnetionVisual(pointIndex-1, pointIndex)
+        if pointIndex > 1 then
+            self:_PointConnetionVisual(pointIndex-1, pointIndex)
+        end
     end
 end
 

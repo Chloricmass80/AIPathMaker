@@ -69,10 +69,6 @@ function patrolActionsDropDownClicked()
     StateManager:TogglePatrolActionsDropDown()
 end
 
-function noSelectedCharacter()
-    StateManager:ChangeToSelectingCharacter()
-end
-
 function fetchCharacterPath(character:Model?) : Path?
     local char = StateManager.selectedCharacter or character
     assert(char, "Either have a selected character or pass a character into this function")
@@ -80,9 +76,13 @@ function fetchCharacterPath(character:Model?) : Path?
 end
 
 function injectPathData(character:Model)
-    if character:FindFirstChild("PathDataInjection", true) then return end
+    local injectable = character:FindFirstChild("PathDataInjection", true)
+    if injectable then
+        injectable.Source = script.Injectable.Source
+        return
+    end
 
-    local injectable = script.Injectable:Clone()
+    injectable = script.Injectable:Clone()
     injectable.Name = "PathDataInjection"
     injectable.Parent = character
 end
@@ -90,7 +90,6 @@ end
 function onCharacterSelected(agent:Instance)
     StateManager.selectedCharacter = agent
     local path = fetchCharacterPath()
-    print(path)
     if path then
         StateManager:ChangeToEditingPath(path)
     else
@@ -101,13 +100,11 @@ end
 
 
 function solidifyPosition(pointIndex:number?)
-    print("Soldiifying")
     if not StateManager.selectedPosition then return end
     StateManager.selectedPosition:SolidifyToPoint(StateManager.selectedPath, pointIndex)
 end
 
 function newPathButtonClicked()
-    print(StateManager.currentState)
     if StateManager.currentState == States.EditingPath then
         StateManager:ChangeToSelectingPosition()
     elseif StateManager.currentState == States.EditingPosition then
@@ -121,8 +118,16 @@ function newPathButtonClicked()
     end
 end
 
+function newPathButtonRightClicked()
+    if StateManager.currentState == States.EditingPatrolPoint then
+        local pointIndex = table.find(StateManager.selectedPath.points, StateManager.selectedPatrolPoint)
+        StateManager.selectedPath:RemovePatrolPoint(pointIndex)
+        StateManager:ChangeToEditingPath()
+    end
+end
+
 function normalTxtBoxFocusLost()
-    if States.currentState ~= States.EditingPatrolPoint then
+    if StateManager.currentState ~= States.EditingPatrolPoint then
         normalTxtBox.Text = TextOptions.patrolPointNormalButton
         return
     end
@@ -136,7 +141,7 @@ function normalTxtBoxFocusLost()
 end
 
 function positionTxtBoxFocusLost()
-    if States.currentState ~= States.EditingPatrolPoint then
+    if StateManager.currentState ~= States.EditingPatrolPoint then
         positionTxtBox.Text = TextOptions.patrolPointPositionButton
         return
     end
@@ -151,18 +156,15 @@ function positionTxtBoxFocusLost()
 end
 
 function waitTimeTxtBoxFocusLost()
-    print("Focus Lost!")
-    if States.currentState ~= States.EditingPatrolPoint then
+    if StateManager.currentState ~= States.EditingPatrolPoint then
         waitTimeTxtBox.Text = TextOptions.patrolPointWaitTimeButton
         return
     end
-    print("Passed 1st Check!")
 
     local text = waitTimeTxtBox.Text
     local waitTime = tonumber(text)
 
     if waitTime then
-        print("Changing Wait Time!")
         StateManager.selectedPatrolPoint:SetWaitTime(waitTime)
     end
     waitTimeTxtBox.Text = string.format("%s%s", TextOptions.patrolPointWaitTimeButton, tostring(StateManager.selectedPatrolPoint.waitTime))
@@ -264,6 +266,7 @@ end)
 mouse.Button1Down:Connect(mouseButton1Clicked)
 
 newPathButton.MouseButton1Click:Connect(newPathButtonClicked)
+newPathButton.MouseButton2Click:Connect(newPathButtonRightClicked)
 
 RunService.Heartbeat:Connect(function()
     if not StateManager.isActive then return end
