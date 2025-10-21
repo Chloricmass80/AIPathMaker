@@ -3,6 +3,8 @@ local Selection = game:GetService("Selection")
 local Tweens = require(script.Tweens)
 local TextOptions = require(script.TextOptions)
 local TypeDefs = require(script.TypeDefinitions)
+local PatrolActionButton = require(script.PatrolActionButton)
+local RecognizedPatrolActions = require(script.RecognizedPatrolActions)
 local States = require(script.StateManager.States)
 
 local Path = require(script.Path)
@@ -39,6 +41,10 @@ patrolActionDropDownButton.Text = TextOptions.patrolActionsDropDownBringUp
 mainFrame.Position = UDim2.fromScale(-0.2, 0)
 patrolActionsFrame.Visible = false
 pathCustomizeFrame.Visible = false
+
+for patrolActionName:string, _ in pairs(RecognizedPatrolActions) do
+    PatrolActionButton.new(patrolActionName)
+end
 
 function createPath(char:Model)
     local savedPathFldr = SavedPaths.SavedPathsFldr

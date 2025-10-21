@@ -1,4 +1,5 @@
 local TypeDefs = require(script.Parent.Parent.TypeDefinitions)
+local StateManager = require(script.Parent.Parent.StateManager)
 local PatrolAction = require(script.Parent.PatrolAction)
 
 local PatrolPoint = {}
@@ -35,6 +36,9 @@ function PatrolPoint.new(position:Vector3, pointIndex:number, patrolPathInstFldr
         waitTime = 0;
         patrolActions = {};
     }, PatrolPoint)
+
+    local pathNum = tonumber(string.sub(patrolPathInstFldr.Name, 9))
+    StateManager:_PointAddedPatrolActionButtons(pathNum, pointIndex)
 
     return self :: PatrolPoint
 end

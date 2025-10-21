@@ -3,6 +3,7 @@ local PatrolAction = require(script.PatrolAction)
 local PointConnection = require(script.PointConnection)
 local SavedPaths = require(script.Parent.SavedPaths)
 local Tweens = require(script.Parent.Tweens)
+local StateManager = require(script.Parent.StateManager)
 local TypeDefs = require(script.Parent.TypeDefinitions)
 
 local Path = {}
@@ -27,6 +28,8 @@ function Path.new(character:Model, parentFldr:Folder) : PatrolPath
         _pointConnections = {};
         points = {};
     }, Path)
+
+    StateManager:_PathAddedPatrolActionButtons()
 
     return self :: PatrolPath
 end

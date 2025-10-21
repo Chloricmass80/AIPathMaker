@@ -38,4 +38,8 @@ function PatrolAction:ChangeWaitForAnim()
     self._inst:SetAttribute("WaitForAnim", self.waitForAnim)
 end
 
+function PatrolAction:Destroy()
+    self._inst:Destroy()
+end
+
 return PatrolAction

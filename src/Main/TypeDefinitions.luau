@@ -5,6 +5,7 @@ export type PatrolAction = {
 
     ChangeWeight : (PatrolAction, weight:number?) -> nil;
     ChangeWaitForAnim : (PatrolAction) -> nil;
+    Destroy : (PatrolAction) -> nil;
 }
 
 export type PatrolPoint = {
@@ -51,6 +52,16 @@ export type PositionSelection = {
     SolidifyToPoint : (PositionSelection, path:PatrolPath, pointIndex:number?) -> nil
 }
 
+export type PatrolActionButton = {
+    patrolActionName : string;
+    button : TextButton;
+    
+    ScanIfActive : (PatrolActionButton) -> nil;
+    NewPathAdded : (PatrolActionButton) -> nil;
+    NewPointAdded : (PatrolActionButton, pathNum:number, pointIndex:number) -> nil;
+    ClearColor : (PatrolActionButton) -> nil;
+}
+
 export type StateManager = {
     currentState : number;
     isActive : boolean;
@@ -60,6 +71,7 @@ export type StateManager = {
     selectedPosition : PositionSelection?;
     selectedCharacter : Model?;
     selectedPatrolPoint : PatrolPoint?;
+    selectedPatrolAction : PatrolAction?;
 
     plugin : Plugin?;
 
@@ -69,6 +81,9 @@ export type StateManager = {
     ChangeToSelectingPosition : (StateManager) -> nil;
     ChangeToEditingPosition : (StateManager, positionSelection : PositionSelection?) -> nil;
     ChangeToEditingPatrolPoint : (StateManager, patrolPoint : PatrolPoint?) -> nil;
+
+    DeselectPatrolAction : (StateManager) -> nil;
+    SelectPatrolAction : (StateManager, patrolAction:PatrolAction) -> nil;
 
     ActivatePatrolActionsDropDown : (StateManager) -> nil;
     DeactivatePatrolActionsDropDown : (StateManager) -> nil;

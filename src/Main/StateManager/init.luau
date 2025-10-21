@@ -2,14 +2,17 @@ local States = require(script.States)
 local TypeDefs = require(script.Parent.TypeDefinitions)
 local TextOptions = require(script.Parent.TextOptions)
 local SavedPaths = require(script.Parent.SavedPaths)
+local PatrolActionButton = require(script.Parent.PatrolActionButton)
 local Tweens = require(script.Parent.Tweens)
 
 local mainUi = script.Parent.AiPathMakerUI
 local mainFrame = mainUi.MainFrame
 local pathCustomizeFrame = mainFrame.PathCustomizeFrame
+local patrolActionActionsFrame = mainFrame.PatrolActionActionsFrame
 local patrolActionsFrame = mainFrame.PatrolActionsFrame
 local patrolActionDropDownButton = patrolActionsFrame.PointActionDropDownButton
 local newPathButton = mainFrame.NewPathButton
+local currentPatrolActionLabel = patrolActionActionsFrame.CurrentPatrolActionLabel
 
 local normalTxtBox = pathCustomizeFrame.PointNormalTxtBox
 local positionTxtBox = pathCustomizeFrame.PointPosTxtBox
@@ -17,8 +20,10 @@ local waitTimeTxtBox = pathCustomizeFrame.PointWaitTxtBox
 
 type PatrolPath = TypeDefs.PatrolPath
 type PatrolPoint = TypeDefs.PatrolPoint
+type PatrolAction = TypeDefs.PatrolAction
 type PositionSelection = TypeDefs.PositionSelection
 type StateManager = TypeDefs.StateManager
+type PatrolActionButton = TypeDefs.PatrolActionButton
 
 
 local StateManager = {
@@ -30,9 +35,36 @@ local StateManager = {
     selectedPosition = nil;
     seletedCharacter = nil;
     selectedPatrolPoint = nil;
+    selectedPatrolAction = nil;
+
+    _patrolActionButtons = {};
 
     plugin = nil
 }
+
+function StateManager:_ScanIfPatrolActionButtonsActive()
+    for _, patrolActionButton:PatrolActionButton in ipairs(self._patrolActionButtons) do
+        patrolActionButton:ScanIfActive()
+    end
+end
+
+function StateManager:_ClearPatrolActionButtonColors()
+    for _, patrolActionButton:PatrolActionButton in ipairs(self._patrolActionButtons) do
+        patrolActionButton:ClearColor()
+    end
+end
+
+function StateManager:_PathAddedPatrolActionButtons()
+    for _, patrolActionButton:PatrolActionButton in ipairs(self._patrolActionButtons) do
+        patrolActionButton:NewPathAdded()
+    end
+end
+
+function StateManager:_PointAddedPatrolActionButtons(pathNum:number, pointIndex:number)
+    for _, patrolActionButton:PatrolActionButton in ipairs(self._patrolActionButtons) do
+        patrolActionButton:NewPointAdded(pathNum, pointIndex)
+    end
+end
 
 function StateManager:ChangeToSelectingCharacter()
     self:_DeselectPatrolPoint()
@@ -61,6 +93,8 @@ function StateManager:ChangeToCharacterSelected(character:Model?)
 end
 
 function StateManager:ChangeToEditingPath(path:PatrolPath?)
+    self:DeselectPatrolAction()
+    self:_ClearPatrolActionButtonColors()
     self:_DeselectPatrolPoint()
     if StateManager.currentState == States.EditingPath then return end
     self.plugin:Deactivate()
@@ -98,6 +132,8 @@ function StateManager:_DeselectPatrolPoint()
     if not point then return end
     self.selectedPatrolPoint = nil
 
+    self:DeselectPatrolAction()
+
     if point._visual:FindFirstChild("PATROL_POINT_SELECTION_HIGHLIGHT") then
         point._visual.PATROL_POINT_SELECTION_HIGHLIGHT.Enabled = false
     end
@@ -133,6 +169,8 @@ function StateManager:_SelectPatrolPoint(point:PatrolPoint)
     else
         highlight.Enabled = true
     end
+
+    self:_ScanIfPatrolActionButtonsActive()
 end
 
 function StateManager:ChangeToEditingPatrolPoint(patrolPoint:PatrolPoint?)
@@ -144,6 +182,26 @@ function StateManager:ChangeToEditingPatrolPoint(patrolPoint:PatrolPoint?)
 
     self.selectedPatrolPoint = patrolPoint
     self:_SelectPatrolPoint(self.selectedPatrolPoint)
+end
+
+
+function StateManager:DeselectPatrolAction()
+    if self.selectedPatrolAction then
+        local oldButton = PatrolActionButton.getButtonFromPatrolAction(self.selectedPatrolAction)
+        oldButton.UIStroke.Color = Color3.new(1,1,1)
+
+        self.selectedPatrolAction = nil
+        currentPatrolActionLabel.Text = "Current Patrol Action:"
+    end
+end
+
+function StateManager:SelectPatrolAction(patrolAction:PatrolAction)
+    self:DeselectPatrolAction()
+
+    currentPatrolActionLabel.Text = string.format("Current Patrol Action: %s", patrolAction.name)
+    self.selectedPatrolAction = patrolAction
+    local selectedButton = PatrolActionButton.getButtonFromPatrolAction(self.selectedPatrolAction)
+    selectedButton.UIStroke.Color = Color3.new(0.454901, 0.886274, 0.6)
 end
 
 function StateManager:ActivatePatrolActionsDropDown()
@@ -161,12 +219,10 @@ function StateManager:DeactivatePatrolActionsDropDown()
 end
 
 function StateManager:TogglePatrolActionsDropDown()
-    self.isPatrolActionsDropDownActive = not self.isPatrolActionsDropDownActive
-
     if self.isPatrolActionsDropDownActive then
-        self:ActivatePatrolActionsDropDown()
-    else
         self:DeactivatePatrolActionsDropDown()
+    else
+        self:ActivatePatrolActionsDropDown()
     end
 end
 
