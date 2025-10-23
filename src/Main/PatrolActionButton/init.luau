@@ -9,6 +9,8 @@ type PatrolPoint = TypeDefs.PatrolPoint
 local mainUi = script.Parent.AiPathMakerUI
 local mainFrame = mainUi.MainFrame
 local patrolActionsFrame = mainFrame.PatrolActionsFrame
+local PatrolActionsActionsFrame = mainFrame.PatrolActionActionsFrame
+local toggleWaitForPatrolActionButton = PatrolActionsActionsFrame.ToggleWaitForPatrolActionButton
 
 function quotientBy3(number:number) : (number, number)
     if math.abs(math.round(number/3) - number/3) <= 0.01 then
@@ -110,10 +112,15 @@ function PatrolActionButton:ScanIfActive()
 
         local pathNum = path.character:GetAttribute("PathNum")
         local pointIndex = table.find(path.points, point)
-        local patrolAction = self._patrolActions[pathNum][pointIndex][self.patrolActionName]
+        local patrolAction:PatrolAction? = self._patrolActions[pathNum][pointIndex][self.patrolActionName]
 
     if patrolAction then
         self.button.UIStroke.Color = Color3.new(0.454901, 0.886274, 0.6)
+        if patrolAction.waitForAnim then
+            toggleWaitForPatrolActionButton.UIStroke.Color = Color3.new(0.454901, 0.886274, 0.6)
+        else
+            toggleWaitForPatrolActionButton.UIStroke.Color = Color3.new(1,1,1)
+        end
     end
 end
 
@@ -128,6 +135,7 @@ end
 
 function PatrolActionButton:ClearColor()
     self.button.UIStroke.Color = Color3.new(1,1,1)
+    toggleWaitForPatrolActionButton.UIStroke.Color = Color3.new(1,1,1)
 end
 
 return PatrolActionButton

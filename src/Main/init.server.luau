@@ -29,8 +29,10 @@ local mainUi = script.AiPathMakerUI
 local mainFrame = mainUi.MainFrame
 local pathCustomizeFrame = mainFrame.PathCustomizeFrame
 local patrolActionsFrame = mainFrame.PatrolActionsFrame
+local patrolActionsActionsFrame = mainFrame.PatrolActionActionsFrame
 local patrolActionDropDownButton = patrolActionsFrame.PointActionDropDownButton
 local newPathButton = mainFrame.NewPathButton
+local toggleWaitForPatrolActionButton = patrolActionsActionsFrame.ToggleWaitForPatrolActionButton
 local normalTxtBox = pathCustomizeFrame.PointNormalTxtBox
 local positionTxtBox = pathCustomizeFrame.PointPosTxtBox
 local waitTimeTxtBox = pathCustomizeFrame.PointWaitTxtBox
@@ -280,6 +282,9 @@ RunService.Heartbeat:Connect(function()
 end)
 
 patrolActionDropDownButton.MouseButton1Click:Connect(patrolActionsDropDownClicked)
+toggleWaitForPatrolActionButton.MouseButton1Click:Connect(function()
+    StateManager:TogglePatrolActionWaitForAction()
+end)
 
 normalTxtBox.FocusLost:Connect(normalTxtBoxFocusLost)
 positionTxtBox.FocusLost:Connect(positionTxtBoxFocusLost)

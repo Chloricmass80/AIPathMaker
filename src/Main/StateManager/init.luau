@@ -12,6 +12,7 @@ local patrolActionActionsFrame = mainFrame.PatrolActionActionsFrame
 local patrolActionsFrame = mainFrame.PatrolActionsFrame
 local patrolActionDropDownButton = patrolActionsFrame.PointActionDropDownButton
 local newPathButton = mainFrame.NewPathButton
+local toggleWaitForPatrolActionButton = patrolActionActionsFrame.ToggleWaitForPatrolActionButton
 local currentPatrolActionLabel = patrolActionActionsFrame.CurrentPatrolActionLabel
 
 local normalTxtBox = pathCustomizeFrame.PointNormalTxtBox
@@ -223,6 +224,35 @@ function StateManager:TogglePatrolActionsDropDown()
         self:DeactivatePatrolActionsDropDown()
     else
         self:ActivatePatrolActionsDropDown()
+    end
+end
+
+function StateManager:ActivatePatrolActionWaitForAction()
+    local action = self.selectedPatrolAction
+    if not action then return end
+    if action.waitForAnim then return end
+    action.waitForAnim = true
+
+    toggleWaitForPatrolActionButton.UIStroke.Color = Color3.new(0.454901, 0.886274, 0.6)
+end
+
+function StateManager:DeactivatePatrolActionWaitForAction()
+    local action = self.selectedPatrolAction
+    if not action then return end
+    if not action.waitForAnim then return end
+    action.waitForAnim = false
+
+    toggleWaitForPatrolActionButton.UIStroke.Color = Color3.new(1,1,1)
+end
+
+function StateManager:TogglePatrolActionWaitForAction()
+    local action = self.selectedPatrolAction
+    if not action then return end
+
+    if action.waitForAnim then
+        self:DeactivatePatrolActionWaitForAction()
+    else
+        self:ActivatePatrolActionWaitForAction()
     end
 end
 

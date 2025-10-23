@@ -88,6 +88,9 @@ export type StateManager = {
     ActivatePatrolActionsDropDown : (StateManager) -> nil;
     DeactivatePatrolActionsDropDown : (StateManager) -> nil;
     TogglePatrolActionsDropDown : (StateManager) -> nil;
+    ActivatePatrolActionWaitForAction : (StateManager) -> nil;
+    DeactivatePatrolActionWaitForAction : (StateManager) -> nil;
+    TogglePatrolActionWaitForAction : (StateManager) -> nil;
     DisablePlugin : (StateManager) -> nil;
     EnablePlugin : (StateManager) -> nil;
     TogglePlugin : (StateManager) -> nil;
